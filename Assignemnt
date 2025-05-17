@@ -1,0 +1,68 @@
+//Rust-for assignments memory management
+use std::io;
+
+fn convert_to_kg(pounds: f64) -> f64 {
+    pounds / 2.2
+}
+
+fn main() {
+    let mut input = String::new();
+    println!("Enter weight in pounds:");
+    io::stdin().read_line(&mut input).expect("Failed to read input");
+
+    let pounds: f64 = input.trim().parse().expect("Invalid number");
+    let kg = convert_to_kg(pounds);
+    println!("Weight in kilograms: {:.2}", kg);
+}
+
+
+
+
+
+
+
+
+//Java
+import java.util.Scanner;
+
+public class WeightConverter {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);  // Allocated on heap
+        System.out.print("Enter weight in pounds: ");
+        double pounds = scanner.nextDouble();
+        double kg = pounds / 2.2;
+        System.out.printf("Weight in kilograms: %.2f%n", kg);
+        scanner.close(); // Recommended, but GC will clean up eventually
+    }
+}
+
+
+
+
+
+//C++
+#include <iostream>
+
+double convertToKg(double pounds) {
+    return pounds / 2.2;
+}
+
+int main() {
+    double* pounds = new double;
+    std::cout << "Enter weight in pounds: ";
+    std::cin >> *pounds;
+
+    double* kg = new double;
+    *kg = convertToKg(*pounds);
+
+    std::cout << "Weight in kilograms: " << *kg << std::endl;
+
+    delete pounds; // Manual deallocation
+    delete kg;
+    return 0;
+}
+
+
+  
+
+
