@@ -1,0 +1,47 @@
+//## assigbnment #2: type systems, scopes
+
+
+//python
+def convert_to_kg(pounds):
+    return pounds / 2.2
+
+weight = float(input("Enter weight in pounds: "))
+converted = convert_to_kg(weight)
+print(f"Weight in kilograms: {converted:.2f}")
+
+
+
+
+
+
+//JavaScript
+function convertToKg(pounds) {
+    return pounds / 2.2;
+}
+
+let weight = prompt("Enter weight in pounds:");
+weight = parseFloat(weight);
+let converted = convertToKg(weight);
+console.log("Weight in kilograms: " + converted.toFixed(2));
+
+
+
+
+//C++
+
+#include <iostream>
+using namespace std;
+
+double convertToKg(double pounds) {
+    return pounds / 2.2;
+}
+
+int main() {
+    double weight;
+    cout << "Enter weight in pounds: ";
+    cin >> weight;
+    double converted = convertToKg(weight);
+    cout << "Weight in kilograms: " << converted << endl;
+    return 0;
+}
+
