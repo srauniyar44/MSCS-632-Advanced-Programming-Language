@@ -1,0 +1,69 @@
+
+    
+## Assignment 4: Implementing control strctures
+
+import random
+
+
+DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+SHIFTS = ["Morning", "Afternoon", "Evening"]
+
+
+employees = []
+preferences = {}
+
+num_employees = int(input("How many employees? "))
+
+for _ in range(num_employees):
+    name = input("Enter employee name: ")
+    employees.append(name)
+    preferences[name] = {}
+
+    print(f"Enter {name}'s preferred shift for each day (Morning, Afternoon, Evening):")
+    for day in DAYS:
+        while True:
+            shift = input(f"  {day}: ").capitalize()
+            if shift in SHIFTS:
+                preferences[name][day] = shift
+                break
+            else:
+                print("Invalid input. Please enter Morning, Afternoon, or Evening.")
+
+
+schedule = {day: {shift: [] for shift in SHIFTS} for day in DAYS}
+days_worked = {name: 0 for name in employees}
+
+for day in DAYS:
+    assigned_today = set() 
+
+    for name in employees:
+        if days_worked[name] >= 5:
+            continue  
+
+        preferred_shift = preferences[name][day]
+        if len(schedule[day][preferred_shift]) < 2 and name not in assigned_today:
+            schedule[day][preferred_shift].append(name)
+            days_worked[name] += 1
+            assigned_today.add(name)
+
+  
+    for shift in SHIFTS:
+        while len(schedule[day][shift]) < 2:
+            available = [
+                name for name in employees
+                if name not in assigned_today and days_worked[name] < 5
+            ]
+            if not available:
+                break  
+            chosen = random.choice(available)
+            schedule[day][shift].append(chosen)
+            days_worked[chosen] += 1
+            assigned_today.add(chosen)
+
+print("\n--- Final Weekly Schedule ---\n")
+for day in DAYS:
+    print(f"{day}:")
+    for shift in SHIFTS:
+        workers = schedule[day][shift]
+        print(f"  {shift}: {', '.join(workers) if workers else 'None'}")
+    print()
