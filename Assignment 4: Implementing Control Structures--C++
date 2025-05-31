@@ -1,0 +1,133 @@
+/* Online C++ Compiler and Editor */
+#include <iostream>
+
+#include <iostream>
+#include <vector>
+#include <map>
+#include <string>
+#include <algorithm>
+#include <ctime>Aplha
+#include <cstdlib>
+
+using namespace std;
+
+
+const vector<string> DAYS = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+const vector<string> SHIFTS = {"Morning", "Afternoon", "Evening"};
+
+
+struct Employee {
+    string name;
+    map<string, string> preferences; 
+    int daysWorked = 0;
+};
+
+
+void getEmployeePreferences(vector<Employee>& employees, int numEmployees) {
+    for (int i = 0; i < numEmployees; i++) {
+        Employee emp;
+        cout << "Enter employee name: ";
+        cin >> emp.name;
+
+        cout << "Enter " << emp.name << "'s preferred shift for each day (Morning, Afternoon, Evening):\n";
+        for (string day : DAYS) {
+            string shift;
+            while (true) {
+                cout << "  " << day << ": ";
+                cin >> shift;
+
+             
+                shift[0] = toupper(shift[0]);
+                transform(shift.begin() + 1, shift.end(), shift.begin() + 1, ::tolower);
+
+                if (find(SHIFTS.begin(), SHIFTS.end(), shift) != SHIFTS.end()) {
+                    emp.preferences[day] = shift;
+                    break;
+                } else {
+                    cout << "Invalid shift. Please enter Morning, Afternoon, or Evening.\n";
+                }
+            }
+        }
+        employees.push_back(emp);
+    }
+}
+
+
+void assignShifts(
+    vector<Employee>& employees,
+    map<string, map<string, vector<string>>>& schedule
+) {
+    srand(time(0));
+
+    for (string day : DAYS) {
+        vector<string> assignedToday;
+
+        for (Employee& emp : employees) {
+            if (emp.daysWorked >= 5) continue;
+
+            string shift = emp.preferences[day];
+            if (schedule[day][shift].size() < 2 &&
+                find(assignedToday.begin(), assignedToday.end(), emp.name) == assignedToday.end()) {
+
+                schedule[day][shift].push_back(emp.name);
+                emp.daysWorked++;
+                assignedToday.push_back(emp.name);
+            }
+        }
+
+
+        for (string shift : SHIFTS) {
+            while (schedule[day][shift].size() < 2) {
+                vector<Employee*> available;
+                for (Employee& emp : employees) {
+                    if (emp.daysWorked < 5 &&
+                        find(assignedToday.begin(), assignedToday.end(), emp.name) == assignedToday.end()) {
+                        available.push_back(&emp);
+                    }
+                }
+
+                if (available.empty()) break;
+
+                Employee* chosen = available[rand() % available.size()];
+                schedule[day][shift].push_back(chosen->name);
+                chosen->daysWorked++;
+                assignedToday.push_back(chosen->name);
+            }
+        }
+    }
+}
+
+void printSchedule(const map<string, map<string, vector<string>>>& schedule) {
+    cout << "\n--- Final Weekly Schedule ---\n\n";
+    for (string day : DAYS) {
+        cout << day << ":\n";
+        for (string shift : SHIFTS) {
+            cout << "  " << shift << ": ";
+            if (schedule.at(day).at(shift).empty()) {
+                cout << "None";
+            } else {
+                for (string name : schedule.at(day).at(shift)) {
+                    cout << name << " ";
+                }
+            }
+            cout << endl;
+        }
+        cout << endl;
+    }
+}
+
+
+int main() {
+    int numEmployees;
+    vector<Employee> employees;
+    map<string, map<string, vector<string>>> schedule;
+
+    cout << "How many employees? ";
+    cin >> numEmployees;
+
+    getEmployeePreferences(employees, numEmployees);
+    assignShifts(employees, schedule);
+    printSchedule(schedule);
+
+    return 0;
+}
