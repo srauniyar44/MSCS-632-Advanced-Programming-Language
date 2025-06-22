@@ -1,0 +1,27 @@
+from collections import Counter
+
+class StatisticsCalculator:
+    def __init__(self, numbers):
+        self.numbers = numbers
+
+    def mean(self):
+        return sum(self.numbers) / len(self.numbers)
+
+    def median(self):
+        nums = sorted(self.numbers)
+        n = len(nums)
+        if n % 2 == 0:
+            return (nums[n // 2 - 1] + nums[n // 2]) / 2
+        return nums[n // 2]
+
+    def mode(self):
+        freq = Counter(self.numbers)
+        max_freq = max(freq.values())
+        return [num for num, count in freq.items() if count == max_freq]
+
+if __name__ == "__main__":
+    data = [4, 1, 2, 2, 3, 5, 4, 2]
+    calc = StatisticsCalculator(data)
+    print("Mean:", calc.mean())
+    print("Median:", calc.median())
+    print("Mode:", calc.mode())
