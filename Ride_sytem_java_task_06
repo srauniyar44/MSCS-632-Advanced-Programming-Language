@@ -1,0 +1,87 @@
+// Java Implementation of Data Processing System
+import java.io.*;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.locks.*;
+
+class Task {
+    private final int id;
+    public Task(int id) {
+        this.id = id;
+    }
+    public int getId() {
+        return id;
+    }
+}
+
+class SharedQueue {
+    private final Queue<Task> queue = new LinkedList<>();
+    private final Lock lock = new ReentrantLock();
+
+    public void addTask(Task task) {
+        lock.lock();
+        try {
+            queue.add(task);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public Task getTask() {
+        lock.lock();
+        try {
+            return queue.poll();
+        } finally {
+            lock.unlock();
+        }
+    }
+}
+
+class Worker implements Runnable {
+    private final SharedQueue queue;
+    private final BufferedWriter writer;
+    private final int workerId;
+
+    public Worker(SharedQueue queue, BufferedWriter writer, int id) {
+        this.queue = queue;
+        this.writer = writer;
+        this.workerId = id;
+    }
+
+    public void run() {
+        try {
+            while (true) {
+                Task task = queue.getTask();
+                if (task == null) break;
+
+                Thread.sleep(100); // Simulate processing delay
+
+                synchronized (writer) {
+                    writer.write("Worker " + workerId + " processed task " + task.getId() + "\n");
+                }
+            }
+        } catch (InterruptedException | IOException e) {
+            System.err.println("Worker " + workerId + " encountered an error: " + e.getMessage());
+        }
+    }
+}
+
+public class DataProcessingSystem {
+    public static void main(String[] args) {
+        SharedQueue queue = new SharedQueue();
+        for (int i = 1; i <= 20; i++) {
+            queue.addTask(new Task(i));
+        }
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("output_java.txt"))) {
+            ExecutorService executor = Executors.newFixedThreadPool(4);
+            for (int i = 1; i <= 4; i++) {
+                executor.execute(new Worker(queue, writer, i));
+            }
+            executor.shutdown();
+            executor.awaitTermination(5, TimeUnit.SECONDS);
+        } catch (IOException | InterruptedException e) {
+            System.err.println("Main encountered an error: " + e.getMessage());
+        }
+    }
+}
