@@ -1,0 +1,28 @@
+let mean lst =
+  let total = List.fold_left (+.) 0.0 (List.map float_of_int lst) in
+  total /. float_of_int (List.length lst)
+
+let median lst =
+  let sorted = List.sort compare lst in
+  let len = List.length sorted in
+  if len mod 2 = 0 then
+    let mid1 = List.nth sorted (len/2 - 1) in
+    let mid2 = List.nth sorted (len/2) in
+    (float_of_int (mid1 + mid2)) /. 2.0
+  else
+    float_of_int (List.nth sorted (len/2))
+
+let mode lst =
+  let counts = List.fold_left
+    (fun acc x -> if List.mem_assoc x acc then
+                    (x, List.assoc x acc + 1) :: (List.remove_assoc x acc)
+                  else
+                    (x, 1) :: acc)
+    [] lst in
+  fst (List.fold_left (fun (m, mc) (x, c) -> if c > mc then (x, c) else (m, mc)) (0, 0) counts)
+
+let () =
+  let data = [4; 1; 2; 2; 3; 5; 4; 2] in
+  Printf.printf "Mean: %.3f\n" (mean data);
+  Printf.printf "Median: %.3f\n" (median data);
+  Printf.printf "Mode: %d\n" (mode data)
