@@ -1,0 +1,52 @@
+// Go Implementation of Data Processing System
+package main
+
+import (
+	"fmt"
+	"log"
+	"os"
+	"sync"
+	"time"
+)
+
+type Task struct {
+	ID int
+}
+
+func worker(id int, tasks <-chan Task, wg *sync.WaitGroup, mu *sync.Mutex, file *os.File) {
+	defer wg.Done()
+	for task := range tasks {
+		time.Sleep(100 * time.Millisecond) // Simulate processing
+		mu.Lock()
+		_, err := fmt.Fprintf(file, "Worker %d processed task %d\n", id, task.ID)
+		mu.Unlock()
+		if err != nil {
+			log.Printf("Worker %d encountered error: %v\n", id, err)
+		}
+	}
+	log.Printf("Worker %d done.\n", id)
+}
+
+func main() {
+	tasks := make(chan Task, 20)
+	var wg sync.WaitGroup
+	var mu sync.Mutex
+
+	file, err := os.Create("output_go.txt")
+	if err != nil {
+		log.Fatalf("Failed to create output file: %v", err)
+	}
+	defer file.Close()
+
+	for i := 1; i <= 4; i++ {
+		wg.Add(1)
+		go worker(i, tasks, &wg, &mu, file)
+	}
+
+	for i := 1; i <= 20; i++ {
+		tasks <- Task{ID: i}
+	}
+	close(tasks)
+
+	wg.Wait()
+}
