@@ -1,0 +1,17 @@
+?- grandparent(john, alice).
+true.
+
+?- sibling(alice, bob).
+true.
+
+?- cousin(emily, david).
+true.
+
+?- descendant(bob, john).
+true.
+
+?- descendant(emily, john).
+true.
+
+?- cousin(alice, alice).
+false.
